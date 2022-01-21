@@ -7,4 +7,4 @@ with open("contacts.json", "w") as f:
 with open("contacts.json", "r") as f:
     contacts = json.load(f)  # loads the file as a Python dictionary
 
-print(contacts)  
+print(contacts) 
