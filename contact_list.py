@@ -62,7 +62,7 @@ class Contacts:
         else:
             return False 
 
-    def add_contact(self):
+    def add_contact(self):  # IMPLEMENTED
         """method for adding a contact."""
         info = []
         
@@ -124,7 +124,6 @@ class Contacts:
         
         key = f_name + "_" + l_name  # key = "{f_name}_{l_name}"
         self.contact_list[key] = info   # register new contact's info into the contact list
-
 
     def delete_contact(self):
         """method for deleting a contact."""
