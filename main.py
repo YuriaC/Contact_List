@@ -7,29 +7,24 @@ def show_direction_prompt():
 
 my_contact = Contacts()
 
-show_direction_prompt()
+show_direction_prompt()   # show prompt
+
 while True:
     choice = input("Type a command: ")
 
     if choice.lower() == "add":
-        #my_contact.add_contact()  #
-        print("Contact added!") #
-        pass
+        my_contact.add_contact()
+        print("Contact added!")  #
 
     elif choice.lower() == "delete":
-        #my_contact.delete_contact()  #
-        print("Contact deleted!") #
-        pass
+        my_contact.delete_contact()
 
     elif choice.lower() == "list":
-        #my_contact.list_contacts()  #
-        print("contact printed") #
-        pass
+        my_contact.list_contacts(my_contact.contact_list)
 
     elif choice.lower() == "search":
-        #my_contact.search_contact()  #
-        print("result fetched.") #
-        pass
+        result = my_contact.search_contact()
+        my_contact.search_result_interpretor(result)
 
     elif choice.lower() == "q":
         #my_contact.save_contacts()  #

@@ -33,7 +33,7 @@ class Contacts:
             return False
         
         splitted_email = email_address.split("@")
-        identifier = splitted_email[":-1"]
+        identifier = splitted_email[: -1]
         domain = splitted_email[-1]
             
         if "." not in domain: 
@@ -142,15 +142,14 @@ class Contacts:
             print("No response is registered. ")
         
         else:
-            email_address.lower()
             info.append({"address" : address})
         
         key = contact_name[0] + "_" + contact_name[1]  # key = "{f_name}_{l_name}"
         self.contact_list[key] = info   # register new contact's info into the contact list
 
-    def search_contact(self, credential):  # IMPLEMENTED
+    def search_contact(self):  # IMPLEMENTED
         """method for searching for a contact. Takes a lst obj, Return a dict obj"""
-        
+        credential = self.ask_for_contact_name()
         pre_selection = dict()
         result = dict()
 
@@ -180,14 +179,15 @@ class Contacts:
 
     def delete_contact(self):  # IMPLEMENTED
         """method for deleting a contact."""
-        credential = self.ask_for_contact_name()
-        resulting_contact = self.search_contact(credential)
-        if resulting_contact == 0:
+        resulting_contact = self.search_contact()
+
+        if len(resulting_contact) == 0:
             print("No contact found!")
         
-        elif resulting_contact == 1:
+        elif len(resulting_contact) == 1:
             key = list(resulting_contact.keys())[0]  
             self.contact_list.pop(key)
+            print("Contact deleted.")
         
         else:
             print("More than 1 contact found. Please specified search creteria!")
@@ -202,7 +202,7 @@ class Contacts:
                 contact_name[n] = contact_name[n].capitalize()
 
             print(f"{index}. {' '.join(contact_name)}")  # print contact name
-            for sub_dict_obj in v:
+            for sub_dict_obj in value:
                 for k, v in sub_dict_obj.items():
                     print(f"\t{k.capitalize()}: {v}")
 
