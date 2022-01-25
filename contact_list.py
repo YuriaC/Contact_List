@@ -1,13 +1,22 @@
-from distutils.ccompiler import new_compiler
-from operator import ne
-
+import json
 
 class Contacts:
-    num_existing_contact_lst = 0
+    # num_existing_contact_lst = 0  #
+    file_path = "contacts.json"
+        
+    def __init__(self): 
+        self.contact_list = self.read_contacts(Contacts.file_path)
+       
+    def read_contacts(self, file_path):
+        """a method serves to load contact data from an existing json file. An empty dict will be created
+        upon the case that file not found. Returns a dict obj"""
+        try:
+            with open(file_path, 'r') as file:  # loads the file as a Python dictionary
+                contact_list = json.load(file)
+        except FileNotFoundError:  # if file failed to open, then create a new dict obj to store data 
+            contact_list = dict()
 
-    def __init__(self):
-        self.contact_list =dict()
-        self.contatc_num = 0
+        return contact_list   
 
     @staticmethod
     def phone_num_validation(string):
@@ -88,64 +97,67 @@ class Contacts:
         
         return credential
 
-    def add_contact(self):  # IMPLEMENTED
+    def add_contact(self):  # REVISED
         """method for adding a contact."""
         info = []
         
         contact_name = self.ask_for_contact_name()
-        info.append({"first name" : contact_name[0]})
-        info.append({"last name" : contact_name[1]})
+        key = contact_name[0] + "_" + contact_name[1]  # key = "{f_name}_{l_name}"
 
-        # register mobile phone number
-        mobile_num = Contacts.check_if_user_input_is_empty("Mobile Phone Number (optional): ")
-        if not mobile_num:  # when entry is  empty
-            print("No response is registered. ")
+        if key in self.contact_list:
+            print("Contact already exists in current contacts list!")
         
         else:
-            cell_validity_check = Contacts.phone_num_validation(mobile_num)  # check if the phone_num is legit
-            if cell_validity_check:  # if passed data validation
-                info.append({"mobile phone" : mobile_num})
-            
-            else: 
-                print("Invalid phone number. This info won't be registered.")
-
-        # register home phone number
-        home_num = Contacts.check_if_user_input_is_empty("Home Phone Number(optional): ")
-        if not home_num:
-            print("No response is registered. ")
-
-        else:
-            home_num_validity_check = Contacts.phone_num_validation(home_num)
-            if home_num_validity_check:
-                info.append({"home phone" : home_num})
-            
-            else: 
-                print("Invalid phone number. This info won't be registered.")
-
-        # register email address
-        email_address = Contacts.check_if_user_input_is_empty("Email Address (optional): ")
-        if not email_address:
-            print("No response is registered. ")
-
-        else:
-            email_address.lower()
-            email_validity_check = Contacts.email_verifier(email_address)
-            if email_validity_check:
-                info.append({"email address" : email_address})
+            # register mobile phone number
+            mobile_num = Contacts.check_if_user_input_is_empty("Mobile Phone Number (optional): ")
+            if not mobile_num:  # when entry is  empty
+                print("No response is registered. ")
             
             else:
-                print("Invalid email address. This info won't be registered.")
-        
-        # register address
-        address = Contacts.check_if_user_input_is_empty("Address (optional): ")
-        if not address:
-            print("No response is registered. ")
-        
-        else:
-            info.append({"address" : address})
-        
-        key = contact_name[0] + "_" + contact_name[1]  # key = "{f_name}_{l_name}"
-        self.contact_list[key] = info   # register new contact's info into the contact list
+                cell_validity_check = Contacts.phone_num_validation(mobile_num)  # check if the phone_num is legit
+                if cell_validity_check:  # if passed data validation
+                    info.append({"mobile phone" : mobile_num})
+                
+                else: 
+                    print("Invalid phone number. This info won't be registered.")
+
+            # register home phone number
+            home_num = Contacts.check_if_user_input_is_empty("Home Phone Number(optional): ")
+            if not home_num:
+                print("No response is registered. ")
+
+            else:
+                home_num_validity_check = Contacts.phone_num_validation(home_num)
+                if home_num_validity_check:
+                    info.append({"home phone" : home_num})
+                
+                else: 
+                    print("Invalid phone number. This info won't be registered.")
+
+            # register email address
+            email_address = Contacts.check_if_user_input_is_empty("Email Address (optional): ")
+            if not email_address:
+                print("No response is registered. ")
+
+            else:
+                email_address.lower()
+                email_validity_check = Contacts.email_verifier(email_address)
+                if email_validity_check:
+                    info.append({"email address" : email_address})
+                
+                else:
+                    print("Invalid email address. This info won't be registered.")
+            
+            # register address
+            address = Contacts.check_if_user_input_is_empty("Address (optional): ")
+            if not address:
+                print("No response is registered. ")
+            
+            else:
+                info.append({"address" : address})
+            
+            self.contact_list[key] = info   # register new contact's info into the contact list
+            print("Contact added!")
 
     def search_contact(self):  # IMPLEMENTED
         """method for searching for a contact. Takes a lst obj, Return a dict obj"""
@@ -192,15 +204,21 @@ class Contacts:
         else:
             print("More than 1 contact found. Please specified search creteria!")
 
+    def format_name(self, string):  # NEW ADDITION
+        """extracting and formating the name of the contact found"""
+        name = string.split("_")
+        for n in range(len(name)):
+            name[n] = name[n].capitalize()
+
+        full_name = " ".join(name)
+        
+        return full_name
+
     def list_contacts(self, dict_obj):  # IMPLEMENTED 
         """method for printing contacts in a contact list in alphabetical order."""
         index = 1
         for key, value in dict_obj.items():
-            # formatting contact name
-            contact_name = key.split("_")
-            for n in range(len(contact_name)):
-                contact_name[n] = contact_name[n].capitalize()
-
+            contact_name = self.format_name(key)  # formatting contact name
             print(f"{index}. {' '.join(contact_name)}")  # print contact name
             for sub_dict_obj in value:
                 for k, v in sub_dict_obj.items():
@@ -209,10 +227,96 @@ class Contacts:
             print("")
             index += 1
         
-    def save_contacts(self):
+    def save_contacts(self):  # NEW_ADDITION
         """method for saving a contact list."""
-        pass
+        contacts = self.contact_list
+        with open("contacts.json", "w") as file:
+            json.dump(contacts, file)  # writes a Python dictionary as json file
+        
+        file.close()
 
-    def edit_contact(self):
+    def edit_contact(self):  # NEW_ADDITION
         """method for editing the info of an existing contact"""
-        pass
+        result = self.search_contact()
+        
+        if len(result) == 1:  # if exact mathing is found
+            key = list(result.keys())[0]  # retrive key for the contact info
+            
+            contact_name = self.format_name(key)
+            print(f"Editing info for contact: {contact_name}")
+            
+            # getting new info
+            new_info = []
+
+            # register mobile phone number
+            mobile_num = Contacts.check_if_user_input_is_empty("Mobile Phone Number (optional): ")
+            if not mobile_num:  # when entry is  empty
+                print("No response is registered. ")
+            
+            else:
+                cell_validity_check = Contacts.phone_num_validation(mobile_num)  # check if the phone_num is legit
+                if cell_validity_check:  # if passed data validation
+                    new_info.append({"mobile phone" : mobile_num})
+                
+                else: 
+                    print("Invalid phone number. This info won't be registered.")
+
+            # register home phone number
+            home_num = Contacts.check_if_user_input_is_empty("Home Phone Number(optional): ")
+            if not home_num:
+                print("No response is registered. ")
+
+            else:
+                home_num_validity_check = Contacts.phone_num_validation(home_num)
+                if home_num_validity_check:
+                    new_info.append({"home phone" : home_num})
+                
+                else: 
+                    print("Invalid phone number. This info won't be registered.")
+
+            # register email address
+            email_address = Contacts.check_if_user_input_is_empty("Email Address (optional): ")
+            if not email_address:
+                print("No response is registered. ")
+
+            else:
+                email_address.lower()
+                email_validity_check = Contacts.email_verifier(email_address)
+                if email_validity_check:
+                    new_info.append({"email address" : email_address})
+                
+                else:
+                    print("Invalid email address. This info won't be registered.")
+            
+            # register address
+            address = Contacts.check_if_user_input_is_empty("Address (optional): ")
+            if not address:
+                print("No response is registered. ")
+            
+            else:
+                new_info.append({"address" : address})
+
+            # if new info is empty, then don't over write the old info. if new info is not empty, then over write the old info
+            
+            old_info = self.contact_list[key]  # returns a list obj
+            for entry in new_info:
+                new_keys = entry.keys()
+
+
+
+            for obj in old_info:
+                for detail in obj.keys():
+                    new_info = self.check_if_user_input_is_empty(detail)
+                    if not new_info:
+                        print("No response is registered. ")
+                    
+                    else:
+                        obj[detail] = new_info
+
+            print("Contact info updated.")
+
+        elif len(result) == 0:
+            print("No contact found.")
+
+        else:
+            print("More than 1 contact found. Please specified search creteria!")
