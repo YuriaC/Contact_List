@@ -97,6 +97,9 @@ class Contacts:
             cell_validity_check = Contacts.phone_num_validation(mobile_num)  # check if the phone_num is legit
             if cell_validity_check:  # if passed data validation
                 info.append({"mobile phone" : mobile_num})
+            
+            else: 
+                print("Invalid phone number. This info won't be registered.")
 
         # register home phone number
         home_num = input("Home Phone Number(optional): ")
@@ -105,6 +108,9 @@ class Contacts:
             home_num_validity_check = Contacts.phone_num_validation(mobile_num)
             if home_num_validity_check:
                 info.append({"home phone" : home_num})
+            
+            else: 
+                print("Invalid phone number. This info won't be registered.")
 
         # register email address
         email_address = input("Email Address (optional): ")
@@ -114,6 +120,9 @@ class Contacts:
             email_validity_check = Contacts.email_verifier(email_address)
             if email_validity_check:
                 info.append({"email address" : email_address})
+            
+            else:
+                print("Invalid email address. This info won't be registered.")
         
         # register address
         address = input("Address (optional): ")
@@ -125,8 +134,11 @@ class Contacts:
         key = f_name + "_" + l_name  # key = "{f_name}_{l_name}"
         self.contact_list[key] = info   # register new contact's info into the contact list
 
-    def delete_contact(self):
+    def delete_contact(self):  # implementing
         """method for deleting a contact."""
+        f_name = input("First Name: ") 
+        l_name = input("Last Name: ") 
+        
         pass
 
     def list_contacts(self):
