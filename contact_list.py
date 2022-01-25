@@ -52,48 +52,56 @@ class Contacts:
             return True
 
     @staticmethod
-    def check_if_user_input_is_empty(string):
-        """this method helps to check if a user input string is empty, returns Bool type"""
-        new_string = string.strip(" ")
-        
+    def check_if_user_input_is_empty(prompt):
+        """this method helps to get user input and check if the input string is empty, returns either str or Bool type"""
+        response = input(prompt)
+        new_string = response.strip(" ")
+            
         if len(new_string) > 0:
-            return True
+            return new_string
 
         else:
             return False 
+
+    def ask_for_contact_name(self):
+        """a method that constantly ask for contant's name until non-empty values are given by user input. 
+        Returns a lst obj"""
+        credential = []
+        
+        while True:  # keep asking for input until an non-empty input is given
+            f_name = Contacts.check_if_user_input_is_empty("First Name: ")  # get user input for f_name
+            if not f_name:
+                print("Input cannot be empty!")
+                
+            else:
+                credential.append(f_name.lower())
+                break
+        
+        while True:  # keep asking for input until an non-empty input is given
+            l_name = Contacts.check_if_user_input_is_empty("Last Name: ")  # get user input for l_name
+            if not l_name:
+                print("Input cannot be empty!")
+                
+            else:
+                credential.append(l_name.lower())
+                break
+        
+        return credential
 
     def add_contact(self):  # IMPLEMENTED
         """method for adding a contact."""
         info = []
         
-        # register first name
-        while True:  # keep asking for user input until an non-empty string is given 
-            f_name = input("First Name: ")
-            not_empty_check = Contacts.check_if_user_input_is_empty(f_name)
-            if not not_empty_check:
-                print("Must provide contact's first name!")
-            
-            else: 
-                f_name = f_name.capitalize()
-                info.append({"first name" : f_name})
-                break
-        
-        # register last name
-        while True:  # keep asking for user input until an non-empty string is given 
-            l_name = input("Last Name: ")
-            not_empty_check = Contacts.check_if_user_input_is_empty(l_name)
-            if not not_empty_check:
-                print("Must provide contact's last name!")
-            
-            else:
-                l_name = l_name.capitalize()
-                info.append({"last name" : l_name})
-                break
+        contact_name = self.ask_for_contact_name()
+        info.append({"first name" : contact_name[0]})
+        info.append({"last name" : contact_name[1]})
 
         # register mobile phone number
-        mobile_num = input("Mobile Phone Number (optional): ")
-        not_empty_check = Contacts.check_if_user_input_is_empty(mobile_num)
-        if not_empty_check:  # when entry is not empty
+        mobile_num = Contacts.check_if_user_input_is_empty("Mobile Phone Number (optional): ")
+        if not mobile_num:  # when entry is  empty
+            print("No response is registered. ")
+        
+        else:
             cell_validity_check = Contacts.phone_num_validation(mobile_num)  # check if the phone_num is legit
             if cell_validity_check:  # if passed data validation
                 info.append({"mobile phone" : mobile_num})
@@ -102,10 +110,12 @@ class Contacts:
                 print("Invalid phone number. This info won't be registered.")
 
         # register home phone number
-        home_num = input("Home Phone Number(optional): ")
-        not_empty_check = Contacts.check_if_user_input_is_empty(home_num)
-        if not_empty_check:
-            home_num_validity_check = Contacts.phone_num_validation(mobile_num)
+        home_num = Contacts.check_if_user_input_is_empty("Home Phone Number(optional): ")
+        if not home_num:
+            print("No response is registered. ")
+
+        else:
+            home_num_validity_check = Contacts.phone_num_validation(home_num)
             if home_num_validity_check:
                 info.append({"home phone" : home_num})
             
@@ -113,9 +123,11 @@ class Contacts:
                 print("Invalid phone number. This info won't be registered.")
 
         # register email address
-        email_address = input("Email Address (optional): ")
-        not_empty_check = Contacts.check_if_user_input_is_empty(email_address)
-        if not_empty_check:
+        email_address = Contacts.check_if_user_input_is_empty("Email Address (optional): ")
+        if not email_address:
+            print("No response is registered. ")
+
+        else:
             email_address.lower()
             email_validity_check = Contacts.email_verifier(email_address)
             if email_validity_check:
@@ -125,30 +137,78 @@ class Contacts:
                 print("Invalid email address. This info won't be registered.")
         
         # register address
-        address = input("Address (optional): ")
-        not_empty_check = Contacts.check_if_user_input_is_empty(address)
-        if not_empty_check:
+        address = Contacts.check_if_user_input_is_empty("Address (optional): ")
+        if not address:
+            print("No response is registered. ")
+        
+        else:
             email_address.lower()
             info.append({"address" : address})
         
-        key = f_name + "_" + l_name  # key = "{f_name}_{l_name}"
+        key = contact_name[0] + "_" + contact_name[1]  # key = "{f_name}_{l_name}"
         self.contact_list[key] = info   # register new contact's info into the contact list
 
-    def delete_contact(self):  # implementing
-        """method for deleting a contact."""
-        f_name = input("First Name: ") 
-        l_name = input("Last Name: ") 
+    def search_contact(self, credential):  # IMPLEMENTED
+        """method for searching for a contact. Takes a lst obj, Return a dict obj"""
         
-        pass
+        pre_selection = dict()
+        result = dict()
 
-    def list_contacts(self):
-        """method for printing all contacts in a contact list in alphabetical order."""
-        pass
+        for key, value in self.contact_list.items():
+            contact_name = key.split("_")
 
-    def search_contact(self):
-        """method for searching for a contact."""
-        pass
-    
+            if credential[0] in contact_name[0]:  # if first name search is successful
+                pre_selection[key] = value  # add that contact to a new dictionary
+                    
+                
+        for key, value in pre_selection.items():
+            contact_name = key.split("_")
+                
+            if credential[1] in contact_name[1]:
+                result[key] = value
+
+        return result
+
+    def search_result_interpretor(self, result):  # IMPLEMENTED
+        """a method that helps to show the search contact result"""
+        if len(result) == 0:
+            print("No contact found")
+            return False
+
+        else: 
+            self.list_contacts(result)
+
+    def delete_contact(self):  # IMPLEMENTED
+        """method for deleting a contact."""
+        credential = self.ask_for_contact_name()
+        resulting_contact = self.search_contact(credential)
+        if resulting_contact == 0:
+            print("No contact found!")
+        
+        elif resulting_contact == 1:
+            key = list(resulting_contact.keys())[0]  
+            self.contact_list.pop(key)
+        
+        else:
+            print("More than 1 contact found. Please specified search creteria!")
+
+    def list_contacts(self, dict_obj):  # IMPLEMENTED 
+        """method for printing contacts in a contact list in alphabetical order."""
+        index = 1
+        for key, value in dict_obj.items():
+            # formatting contact name
+            contact_name = key.split("_")
+            for n in range(len(contact_name)):
+                contact_name[n] = contact_name[n].capitalize()
+
+            print(f"{index}. {' '.join(contact_name)}")  # print contact name
+            for sub_dict_obj in v:
+                for k, v in sub_dict_obj.items():
+                    print(f"\t{k.capitalize()}: {v}")
+
+            print("")
+            index += 1
+        
     def save_contacts(self):
         """method for saving a contact list."""
         pass
@@ -156,7 +216,3 @@ class Contacts:
     def edit_contact(self):
         """method for editing the info of an existing contact"""
         pass
-
-    def __repr__(self):
-        """method for presenting a Contacts class obj"""
-        pass 
