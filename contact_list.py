@@ -1,7 +1,6 @@
 import json
 
 class Contacts:
-    # num_existing_contact_lst = 0  #
     file_path = "contacts.json"
         
     def __init__(self): 
